@@ -17,20 +17,41 @@
     -->
     <style>
       /*
-        El body usa Flexbox para centrar el canvas de juego
-        tanto vertical como horizontalmente en la ventana.
-        Se asegura que ocupe el 100% del alto y ancho de la pantalla.
-        El fondo usa un degradado que va desde un azul oscuro (#1a1a2e) 
-        hasta un azul más claro (#16213e) en diagonal.
+        =============================
+        CSS PRINCIPAL PARA TETRIS JS
+        =============================
+        Este CSS controla el diseño responsivo, el fondo animado, el canvas y los botones de UI.
+        Cada sección está comentada para facilitar la comprensión y personalización.
+      */
+
+      /*
+        El html y el body ocupan toda la pantalla y no permiten scroll.
+        Esto asegura que el juego y el fondo siempre llenen el viewport.
+      */
+      html,
+      body {
+        height: 100%; /* Ocupa el 100% de la altura de la ventana */
+        width: 100%; /* Ocupa el 100% del ancho de la ventana */
+        margin: 0; /* Elimina márgenes por defecto */
+        padding: 0; /* Elimina padding por defecto */
+        overflow: hidden !important; /* Bloquea cualquier scroll */
+        box-sizing: border-box; /* Incluye el padding y border en el tamaño total */
+      }
+
+      /*
+        BODY: Centra el canvas usando Flexbox y aplica el fondo animado.
+        - justify-content y align-items centran el contenido.
+        - height y width aseguran que el fondo cubra toda la pantalla.
+        - background y animation crean el degradado animado.
+        - position: relative permite usar ::before y ::after para las estrellas.
+        - overflow: hidden asegura que nada se salga del viewport.
       */
       body {
-        margin: 0;
-        padding: 0;
-        display: flex;
+        display: flex; /* Flexbox para centrar el canvas */
         justify-content: center; /* Centra horizontalmente */
         align-items: center; /* Centra verticalmente */
-        height: 100vh; /* Ocupa todo el alto de la ventana */
-        width: 100vw; /* Ocupa todo el ancho de la ventana */
+        height: 100vh; /* 100% de la altura de la ventana */
+        width: 100vw; /* 100% del ancho de la ventana */
         background: linear-gradient(
           135deg,
           #0f0f23 0%,
@@ -38,14 +59,22 @@
           #16213e 50%,
           #0f3460 75%,
           #533483 100%
-        );
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-        position: relative;
-        overflow: hidden;
+        ); /* Degradado de fondo */
+        background-size: 400% 400%; /* Tamaño grande para animación */
+        animation: gradient 15s ease infinite; /* Anima el fondo */
+        position: relative; /* Para usar ::before y ::after */
+        overflow: hidden !important; /* Bloquea scroll extra */
       }
 
-      /* Efecto de estrellas que destellan */
+      /*
+        =============================
+        FONDO ANIMADO DE ESTRELLAS
+        =============================
+        Se usan ::before y ::after para crear dos capas de estrellas animadas.
+        Cada capa tiene diferentes posiciones, tamaños y animaciones para dar profundidad.
+      */
+
+      /* Primera capa de estrellas (más brillante y rápida) */
       body::before {
         content: "";
         position: absolute;
@@ -53,6 +82,7 @@
         left: 0;
         width: 100%;
         height: 100%;
+        /* Varias estrellas de diferentes tamaños y colores */
         background-image: 
           /* Estrellas pequeñas que destellan */ radial-gradient(
             1px 1px at 20px 30px,
@@ -98,12 +128,12 @@
           radial-gradient(1.5px 1.5px at 520px 180px, #ffff00, transparent),
           radial-gradient(1.5px 1.5px at 720px 280px, #00ff00, transparent);
         background-repeat: repeat;
-        background-size: 1000px 400px;
+        background-size: 100vw 40vh;
         animation: starTwinkle 4s ease-in-out infinite;
         opacity: 0.8;
       }
 
-      /* Segunda capa de estrellas con timing diferente */
+      /* Segunda capa de estrellas (más suave y lenta, para profundidad) */
       body::after {
         content: "";
         position: absolute;
@@ -111,6 +141,7 @@
         left: 0;
         width: 100%;
         height: 100%;
+        /* Más estrellas, diferentes posiciones */
         background-image: radial-gradient(
             1px 1px at 30px 50px,
             #fff,
@@ -136,11 +167,15 @@
           radial-gradient(1px 1px at 930px 950px, #fff, transparent),
           radial-gradient(1px 1px at 980px 1000px, #fff, transparent);
         background-repeat: repeat;
-        background-size: 1000px 1000px;
+        background-size: 100vw 100vh;
         animation: starTwinkle 6s ease-in-out infinite reverse;
         opacity: 0.6;
       }
 
+      /*
+        Animación de parpadeo de las estrellas.
+        Cambia la opacidad y el tamaño para simular destellos.
+      */
       @keyframes starTwinkle {
         0%,
         100% {
@@ -161,6 +196,10 @@
         }
       }
 
+      /*
+        Animación del degradado de fondo.
+        Mueve el fondo para dar sensación de movimiento.
+      */
       @keyframes gradient {
         0% {
           background-position: 0% 50%;
@@ -180,22 +219,28 @@
       }
 
       /*
-        El canvas tiene una sombra para resaltar el área de juego
-        y dar profundidad visual al tablero
+        =============================
+        CANVAS DEL JUEGO
+        =============================
+        El canvas tiene sombra, borde y fondo translúcido para resaltar el área de juego.
+        El filtro drop-shadow da profundidad visual.
       */
       canvas {
         filter: drop-shadow(0px 0px 20px rgba(0, 255, 255, 0.3))
-          drop-shadow(5px 5px 15px rgba(0, 0, 0, 0.6));
+          drop-shadow(5px 5px 15px rgba(0, 0, 0, 0.6)); /* Sombra doble */
         display: block;
-        border-radius: 10px;
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        background: rgba(0, 0, 0, 0.2);
-        backdrop-filter: blur(5px);
+        border-radius: 10px; /* Bordes redondeados */
+        border: 2px solid rgba(255, 255, 255, 0.1); /* Borde sutil */
+        background: rgba(0, 0, 0, 0.2); /* Fondo translúcido */
+        backdrop-filter: blur(5px); /* Difumina el fondo detrás del canvas */
         position: relative;
-        z-index: 10;
+        z-index: 10; /* Sobre el fondo, debajo de los botones */
       }
 
-      /* Efecto de brillo en los bordes del canvas */
+      /*
+        Efecto de brillo animado en los bordes del canvas.
+        Usa un gradiente animado para dar un efecto de neón.
+      */
       canvas::before {
         content: "";
         position: absolute;
@@ -217,6 +262,9 @@
         animation: borderGlow 3s ease-in-out infinite;
       }
 
+      /*
+        Animación del brillo de los bordes del canvas.
+      */
       @keyframes borderGlow {
         0%,
         100% {
@@ -224,6 +272,63 @@
         }
         50% {
           background-position: 100% 50%;
+        }
+      }
+
+      /*
+        =============================
+        BOTONES DE UI (SONIDO Y MÚSICA)
+        =============================
+        Los botones están en una capa fija (#uiLayer) para que no se vean afectados por el fondo.
+        .ui-btn define el estilo visual y la interacción.
+        Media queries los hacen más pequeños en móviles.
+      */
+      #uiLayer {
+        position: fixed; /* Siempre en la misma posición en pantalla */
+        top: 0;
+        right: 0;
+        width: auto;
+        z-index: 2000; /* Sobre el canvas y el fondo */
+        pointer-events: none; /* Solo los hijos reciben eventos */
+      }
+      /* Botones de UI */
+      .ui-btn {
+        position: relative; /* Para stacking context */
+        margin: 20px 20px 0 0; /* Separación de los bordes */
+        background: rgba(0, 0, 0, 0.7); /* Fondo oscuro translúcido */
+        color: white; /* Texto blanco */
+        padding: 12px 18px; /* Espaciado interno */
+        border-radius: 8px; /* Bordes redondeados */
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+        z-index: 2100; /* Sobre el fondo y el canvas */
+        cursor: pointer; /* Cursor de mano */
+        pointer-events: auto; /* Permite clicks */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Sombra sutil */
+        user-select: none; /* No permite seleccionar el texto */
+        transition: background 0.2s, transform 0.2s; /* Animación al presionar */
+      }
+      .ui-btn:active {
+        background: rgba(0, 0, 0, 0.9); /* Más oscuro al presionar */
+        transform: scale(0.97); /* Efecto de presión */
+      }
+      /* Responsive para móviles: botones más pequeños y menos margen */
+      @media (max-width: 600px) {
+        .ui-btn {
+          font-size: 15px;
+          padding: 10px 12px;
+          margin: 12px 12px 0 0;
+        }
+        #uiLayer {
+          right: 0;
+          top: 0;
+        }
+      }
+      @media (max-width: 400px) {
+        .ui-btn {
+          font-size: 13px;
+          padding: 8px 8px;
+          margin: 8px 8px 0 0;
         }
       }
     </style>
@@ -259,42 +364,12 @@
       <!-- <source src="tetris_theme.mp3" type="audio/mpeg"> -->
     </audio>
 
-    <!-- Botón para activar/desactivar sonido -->
-    <div
-      id="soundToggle"
-      style="
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 1000;
-        cursor: pointer;
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 10px;
-        border-radius: 5px;
-        font-family: Arial, sans-serif;
-      "
-    >
-      🔊 Sonido: ON
-    </div>
-
-    <!-- Botón para activar/desactivar música -->
-    <div
-      id="musicToggle"
-      style="
-        position: fixed;
-        top: 60px;
-        right: 20px;
-        z-index: 1000;
-        cursor: pointer;
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 10px;
-        border-radius: 5px;
-        font-family: Arial, sans-serif;
-      "
-    >
-      🎵 Música: ON
+    <!-- Capa de UI para botones -->
+    <div id="uiLayer">
+      <!-- Botón para activar/desactivar sonido -->
+      <div id="soundToggle" class="ui-btn">🔊 Sonido: ON</div>
+      <!-- Botón para activar/desactivar música -->
+      <div id="musicToggle" class="ui-btn">🎵 Música: ON</div>
     </div>
 
     <script>
@@ -549,7 +624,20 @@
        * Define la configuración inicial del juego
        */
       function setup() {
-        createCanvas(900, 600);
+        // Calcular el tamaño máximo disponible para el canvas
+        let maxAncho = min(windowWidth * 0.98, 900);
+        let maxAlto = min(windowHeight * 0.98, 600);
+        // Calcular el tamaño de celda para que el tablero quepa en el canvas
+        let lado_celda = Math.floor(
+          min(
+            (maxAncho - 2 * MARGE_TABLERO) / 10,
+            (maxAlto - 2 * MARGE_TABLERO - 2 * 25) / 20
+          )
+        );
+        if (lado_celda < 10) lado_celda = 10; // tamaño mínimo
+        let anchoCanvas = lado_celda * 10 + 2 * MARGE_TABLERO;
+        let altoCanvas = lado_celda * 20 + 2 * MARGE_TABLERO + 2 * lado_celda;
+        createCanvas(anchoCanvas, altoCanvas);
 
         /**
          * Definición del mapeo base de tetriminos
@@ -626,16 +714,12 @@
 
         // Inicialización de variables globales
         // Importante: No usar let ni var para mantener el alcance global
-        tablero = new Tablero();
+        tablero = new Tablero(lado_celda);
         tetrimino = new Tetrimino();
-
-        // Ajuste del tamaño del canvas según las dimensiones del tablero
         resizeCanvas(
           tablero.ancho + 2 * MARGE_TABLERO,
           tablero.alto + 2 * MARGE_TABLERO + 2 * tablero.lado_celda
         );
-
-        // Inicializar el sistema de audio
         inicializarAudio();
       }
 
@@ -817,6 +901,11 @@
         if (enPantallaInicio && keyCode === ENTER) {
           enPantallaInicio = false;
         }
+      }
+
+      // Hacer el canvas responsivo al cambiar el tamaño de la ventana
+      function windowResized() {
+        setup();
       }
     </script>
   </body>
