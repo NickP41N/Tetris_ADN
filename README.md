@@ -1,10 +1,9 @@
- ## 🚀 Tetris_ADN
+ ## 🚀 Tetris_ADN_JS
 Juego desarrollado por Andrea, Deickar y Nico
-# 🎮 Tetris JS
 
 ¡Bienvenido a Tetris JS! Este es un clon del clásico juego Tetris, desarrollado en JavaScript usando la librería p5.js. El objetivo es apilar las piezas (tetriminos) y eliminar líneas para obtener la mayor puntuación posible.
 
-¿Cómo jugar?
+# 🎮 ¿Cómo jugar?
 
 1. Abre el archivo `index.html` en tu navegador web.
 2. Verás una pantalla de inicio. Presiona **ENTER** para comenzar a jugar.
